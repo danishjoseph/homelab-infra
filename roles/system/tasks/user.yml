@@ -1,0 +1,40 @@
+---
+- name: Ensure the necessary groups exists
+  group:
+    name: '{{ item }}'
+    state: present
+  loop:
+    - '{{ username }}'
+    - docker
+
+- name: Create a login user
+  user:
+    name: '{{ username }}'
+    password: "{{ password | password_hash('sha512') }}"
+    groups:
+      - sudo
+      - docker
+      - users
+    state: present
+    append: true
+    update_password: on_create
+
+- name: Enable passwordless sudo for "{{ username }}"
+  lineinfile:
+    dest: /etc/sudoers
+    regexp: ^%wheel
+    line: '{{ username }} ALL=(ALL) NOPASSWD: ALL'
+    validate: '/usr/sbin/visudo -cf %s'
+  register: sshd_config
+
+- name: Change shell to zsh for "{{ username }}"
+  user:
+    name: '{{ username }}'
+    shell: '{{ shell }}'
+    state: present
+
+- name: Change default shell for root to zsh
+  user:
+    name: root
+    shell: '/bin/zsh'
+    state: present

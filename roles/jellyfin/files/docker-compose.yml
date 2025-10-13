@@ -1,0 +1,25 @@
+---
+version: "3"
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Kolkata
+      - JELLYFIN_PublishedServerUrl=192.168.1.111 #optional
+    volumes:
+      - jellyfin_data:/config
+      - /media/movies:/data/movies
+      - /media/tvseries:/data/tvshows
+      - /media/anime:/data/anime
+    ports:
+      - 8096:8096
+    restart: unless-stopped
+    devices:
+      - /dev/dri:/dev/dri
+
+volumes:
+  jellyfin_data:
+    name: jellyfin_config

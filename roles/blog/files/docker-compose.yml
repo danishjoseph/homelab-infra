@@ -1,0 +1,8 @@
+version: "3"
+services:
+  blog:
+    image: danishjoseph/blog:latest
+    container_name: blog
+    ports:
+      - "1313:80"
+    restart: unless-stopped

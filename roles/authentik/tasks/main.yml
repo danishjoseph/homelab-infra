@@ -1,0 +1,23 @@
+- name: Set file directory path
+  set_fact:
+    role_name: "{{ role_path | basename }}"
+    directory_path: "{{ stacks_src }}/{{ role_name }}"
+
+- name: Create authentik directory
+  file:
+    path: "{{ directory_path }}"
+    state: directory
+    mode: "0755"
+
+- name: Download docker-compose.yml
+  get_url:
+    url: https://goauthentik.io/docker-compose.yml
+    dest: "{{ directory_path }}/docker-compose.yml"
+    mode: "0644"
+
+- name: Populate .env files from vault
+  template:
+    src: env.j2
+    dest: "{{directory_path}}/.env"
+    mode: "0600"
+  notify: deploy {{ role_name }}

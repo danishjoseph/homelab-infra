@@ -1,0 +1,53 @@
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  backend:
+    image: danishjoseph/stockdog:${BACKEND_IMAGE_TAG}
+    expose:
+      - 3000
+    restart: on-failure
+    depends_on:
+      - postgres
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      DB_HOST: ${DB_HOST}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      CRON_SCHEDULE: ${CRON_SCHEDULE}
+      TZ: ${TZ}
+
+  dashboard:
+    image: danishjoseph/stockdog:${DASHBOARD_IMAGE_TAG}
+    ports:
+      - "${GF_PORT}:3000"
+    volumes:
+      - dashboard:/var/lib/grafana
+    restart: on-failure
+    depends_on:
+      - postgres
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GF_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_PASSWORD}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+
+networks:
+  default:
+
+volumes:
+  db-data:
+    external: false
+  dashboard:
+    external: false

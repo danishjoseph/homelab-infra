@@ -1,0 +1,56 @@
+- name: Set file directory path
+  set_fact:
+    role_name: "{{ role_path | basename }}"
+    directory_path: "{{ stacks_src }}/{{ role_name }}"
+
+- name: Create Immich directory
+  file:
+    path: "{{ directory_path }}"
+    state: directory
+    mode: "0755"
+
+- name: Download docker-compose.yml
+  get_url:
+    url: https://github.com/immich-app/immich/releases/latest/download/docker-compose.yml
+    dest: "{{ directory_path }}/docker-compose.yml"
+    mode: "0644"
+
+- name: Download example.env file
+  get_url:
+    url: https://github.com/immich-app/immich/releases/latest/download/example.env
+    dest: "{{ directory_path }}/.env"
+    mode: "0644"
+
+- name: populate env fileS
+  lineinfile:
+    path: "{{ directory_path }}/.env"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - { regexp: "^DB_PASSWORD=", line: "DB_PASSWORD={{ immich.db_password }}" }
+    - {
+        regexp: "^UPLOAD_LOCATION=",
+        line: "UPLOAD_LOCATION={{ immich.upload_location }}",
+      }
+
+- name: Download hwaccel.transcoding.yml file (optional)
+  get_url:
+    url: https://github.com/immich-app/immich/releases/latest/download/hwaccel.transcoding.yml
+    dest: "{{ directory_path }}/hwaccel.transcoding.yml"
+    mode: "0644"
+  when: hwaccel_transcoding_enabled | default(false)
+
+- name: Download hwaccel.ml.yml file (optional)
+  get_url:
+    url: https://github.com/immich-app/immich/releases/latest/download/hwaccel.ml.yml
+    dest: "{{ directory_path }}/hwaccel.ml.yml"
+    mode: "0644"
+  when: hwaccel_ml_enabled | default(false)
+
+- name: Start immich services
+  community.docker.docker_compose_v2:
+    project_src: "{{ directory_path }}"
+    files:
+      - docker-compose.yml
+    pull: always
+    state: present

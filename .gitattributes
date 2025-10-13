@@ -1,0 +1,2 @@
+group_vars/**/*.yml diff=ansible-vault
+host_vars/**/*.yml diff=ansible-vault

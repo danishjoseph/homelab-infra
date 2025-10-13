@@ -1,0 +1,13 @@
+- name: Deploy cloudflared
+  community.docker.docker_compose_v2:
+    project_name: cloudflared
+    definition:
+      version: "2"
+      services:
+        tunnel:
+          container_name: cloudflared
+          image: cloudflare/cloudflared:latest
+          restart: unless-stopped
+          command: tunnel run
+          environment:
+            - TUNNEL_TOKEN={{ cloudflare.token }}

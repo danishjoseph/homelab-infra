@@ -1,0 +1,9 @@
+---
+- include_tasks: essential.yml
+  tags: essential
+- include_tasks: ssh.yml
+  tags: ssh
+- include_tasks: user.yml
+  tags: user
+- include_tasks: docker.yml
+  tags: docker

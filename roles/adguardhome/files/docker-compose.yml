@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  adguardhome:
+    image: adguard/adguardhome
+    container_name: adguardhome
+    restart: unless-stopped
+    volumes:
+      - adguardhome:/opt/adguardhome/work
+      - adguardhome:/opt/adguardhome/conf
+    network_mode: host
+
+volumes:
+  adguardhome:
+    name: adguardhome_data
+    external: false

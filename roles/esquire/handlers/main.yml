@@ -1,0 +1,10 @@
+- name: deploy {{ role_name }}
+  community.docker.docker_compose_v2:
+    project_src: "{{ directory_path }}"
+    project_name: "{{ role_name }}"
+    env_files: "{{directory_path}}/.env"
+    files:
+      - docker-compose.yml
+    pull: always
+    build: always
+    state: present

@@ -1,0 +1,59 @@
+version: "3.8"
+
+services:
+  nginx:
+    container_name: lotterieskerala_gateway
+    image: danishjoseph/lk_backend:nginx
+    depends_on:
+      - backend
+      - client
+    restart: always # because it is routing traffic to our entire app
+    ports:
+      - "8080:80"
+  mariadb:
+    image: mariadb:latest
+    container_name: lotterieskerala_db
+    volumes:
+      - mariadb:/var/lib/mysql
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: "yes"
+      MARIADB_DATABASE: ${DB_PASSWORD}
+      MARIADB_USER: user
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    expose:
+      - 3306
+    restart: unless-stopped
+  backend:
+    image: danishjoseph/lk_backend:main
+    container_name: lotterieskerala_backend
+    restart: always
+    expose:
+      - 3000
+    depends_on:
+      - mariadb
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      LOG_LEVEL: info
+      CRON_INTERVAL: "*/5 10-11 * * * *"
+      DB_HOST: mariadb
+      DB_USER: user
+      DB_PASS: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+  client:
+    image: danishjoseph/lotterieskerala:client
+    container_name: lotterieskerala_client
+    restart: always
+    expose:
+      - 8080
+    depends_on:
+      - backend
+
+networks:
+  default:
+    name: lotterieskerala
+
+volumes:
+  mariadb:
+    name: lotterieskerala_data
+    external: false

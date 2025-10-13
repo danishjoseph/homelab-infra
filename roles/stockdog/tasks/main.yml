@@ -1,0 +1,31 @@
+- name: Set file directory path
+  set_fact:
+    role_name: "{{ role_path | basename }}"
+    directory_path: "{{ stacks_src }}/{{ role_name }}"
+
+- name: Populate prd .env files from vault
+  become_user: "{{ username }}"
+  template:
+    src: env.j2
+    dest: "{{directory_path}}/.env"
+    mode: "0600"
+  notify:
+    - deploy {{ role_name }}
+
+- name: Populate dev .env files from vault
+  become_user: "{{ username }}"
+  template:
+    src: env.dev.j2
+    dest: "{{directory_path}}/.env.dev"
+    mode: "0600"
+  notify:
+    - deploy {{ role_name }} dev
+
+- name: synchronize docker-compose files to server
+  become_user: "{{ username }}"
+  synchronize:
+    src: files/docker-compose.yml
+    dest: "{{ directory_path }}/"
+  notify:
+    - deploy {{ role_name }}
+    - deploy {{ role_name }} dev

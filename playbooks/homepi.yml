@@ -1,0 +1,11 @@
+---
+- hosts: homepi
+  become: true
+  gather_facts: false
+  roles:
+    - role: system
+      tags: ["system"]
+    - role: adguardhome
+      tags: ["container", "adguardhome"]
+    - role: wireguard
+      tags: ["container", "wireguard"]

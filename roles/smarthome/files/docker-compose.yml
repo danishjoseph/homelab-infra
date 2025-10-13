@@ -1,0 +1,21 @@
+version: "3"
+services:
+  mosquitto:
+    container_name: "smarthome_mqtt"
+    image: "eclipse-mosquitto:1.6.10"
+    ports:
+      - "1883:1883"
+      - "1884:9001"
+    restart: always
+  backend:
+    container_name: "smarthome_node"
+    image: "danishjoseph/smarthome:latest"
+    ports:
+      - "3000:3000"
+    command: npm run start:prod
+    volumes:
+      - ./config:/home/node/app/config
+    environment:
+      - MQTT_URL=mosquitto
+      - TZ=Asia/Kolkata
+    restart: always

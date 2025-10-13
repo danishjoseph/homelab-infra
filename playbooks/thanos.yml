@@ -1,0 +1,34 @@
+---
+- hosts: thanos
+  become: true
+  gather_facts: false
+  roles:
+    - role: system
+      tags: ["system"]
+    - role: blog
+      tags: ["container", "blog"]
+    - role: jellyfin
+      tags: ["container", "jellyfin"]
+    - role: actual
+      tags: ["container", "actual"]
+    - role: duplicati
+      tags: ["container", "duplicati"]
+    - role: electrolab
+      tags: ["container", "electrolab"]
+    - role: trichurtrophies
+      tags: ["container", "trichurtrophies"]
+    - role: qbittorrent
+      tags: ["container", "qbittorrent"]
+    - role: uptimekuma
+      tags: ["container", "uptimekuma"]
+    - role: smarthome
+      tags: ["container", "smarthome"]
+    - role: stockdog
+      tags: ["container", "stockdog"]
+    - role: cloudflared
+      tags: ["container", "cloudflared"]
+    - role: authentik
+      tags: ["container", "authentik"]
+    - role: esquire
+      tags: ["container", "esquire"]
+    # - role: immich

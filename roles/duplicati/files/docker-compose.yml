@@ -1,0 +1,23 @@
+---
+version: "2.1"
+services:
+  duplicati:
+    image: lscr.io/linuxserver/duplicati:latest
+    container_name: duplicati
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Asia/Kolkata
+      - CLI_ARGS= '--rebuild-missing-dblock-files'
+    volumes:
+      - configData:/config
+      - /media/thanos_backups:/backups
+      - /home/yagami:/source/homedir
+      - /var/lib/docker/volumes:/source/docker_volumes
+    ports:
+      - 8200:8200
+    restart: unless-stopped
+
+volumes:
+  configData:
+    name: "duplicati"

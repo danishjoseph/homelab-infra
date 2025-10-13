@@ -1,0 +1,25 @@
+- name: Set file directory path
+  set_fact:
+    role_name: "{{ role_path | basename }}"
+    directory_path: "{{ stacks_src }}/{{ role_name }}"
+
+- name: Populate .env files from vault
+  become_user: "{{ username }}"
+  template:
+    src: env.j2
+    dest: "{{directory_path}}/.env"
+    mode: "0600"
+  notify:
+    - deploy {{ role_name }}
+
+- name: synchronize docker-compose files to server
+  become_user: "{{ username }}"
+  synchronize:
+    src: files/docker-compose.yml
+    dest: "{{ directory_path }}/"
+  notify:
+    - deploy {{ role_name }}
+
+- name: trigger container rebuild
+  command: /bin/true
+  notify: deploy {{ role_name }}

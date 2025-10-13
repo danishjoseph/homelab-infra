@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  server:
+    build: https://github.com/danishjoseph/esquire-server.git#main
+    expose:
+      - 3000
+    restart: on-failure
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+
+  app:
+    build: https://github.com/danishjoseph/esquire-ui.git#main
+    ports:
+      - ${APP_PORT}:80
+    depends_on:
+      - server
+
+networks:
+  default:
+
+volumes:
+  db-data:
+    external: false
+
